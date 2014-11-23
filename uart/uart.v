@@ -25,7 +25,9 @@
 	   Stop bits: 1
 */
 
-module uart(input clk,
+module uart #(parameter UART_BAUD = 9600,       // Baud rate of UART transmission
+              parameter INPUT_CLOCK = 50000000) // Frequency in Hz
+           (input clk,
             input rx,
             output tx,
             output reg busy,
@@ -33,9 +35,6 @@ module uart(input clk,
             output reg data_out_valid,
             input [7:0] data_in,
             input data_in_valid);
-
-parameter UART_BAUD = 9600;
-parameter INPUT_CLOCK = 50000000;
 
 parameter CLOCKS_BETWEEN_BITS = INPUT_CLOCK / (UART_BAUD);
 

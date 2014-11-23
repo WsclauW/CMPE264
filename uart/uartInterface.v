@@ -32,7 +32,8 @@ wire [7:0] data_rx;
 wire busy;    
 reg data_tx_valid;
 wire [7:0] data_tx;
-uart uartModule(.clk(clk50MHz),
+uart #(.UART_BAUD(9600), .INPUT_CLOCK(50000000)) uartModule 
+               (.clk(clk50MHz),
                 .rx(rx),
                 .tx(tx),
                 .data_out_valid(data_rx_valid),
