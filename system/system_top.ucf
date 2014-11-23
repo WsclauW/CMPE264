@@ -1,12 +1,12 @@
 # System clock
 NET "clk50MHz" LOC = "B8";
 
-#Reset - switch 7
-NET "reset" LOC = "R17";
-
 # Timing constraint for 50MHz clock
 NET "clk50MHz" TNM_NET = "clk50MHz";
 TIMESPEC "TS_clk50MHz" = PERIOD "clk50MHz" 20ns HIGH 50%;
+
+#Reset - switch 7
+NET "reset" LOC = "R17";
 
 # UART Pin constraints for Nexys 2 w/ Spartan 3e-500
 NET "tx" LOC = "P9";
