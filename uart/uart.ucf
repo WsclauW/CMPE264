@@ -1,4 +1,0 @@
-# Pin constraints for Nexys 2 w/ Spartan 3e-500
-
-NET "tx" LOC = "P9";
-NET "rx" LOC = "U6";
