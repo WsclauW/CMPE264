@@ -15,10 +15,17 @@ module xort(input a, b,
 	assign c = a^b;
 endmodule
 
-module exponentAddition();
+module exponentAddition(input [7:0] a, b, 
+									output [7:0] hi_output, low_output);
+		reg [15:0] sum;
+		always@(*)
+			assign sum = a + b;
+			assign low_output = sum[7:0];
+			assign hi_output = sum[15:8];
 endmodule
 
-module exponentUpdate();
+module exponentUpdate(input [7:0] a,b,
+									output [7:0] c);
 endmodule
 
 // multiplier takes two significands and multiplies them together
