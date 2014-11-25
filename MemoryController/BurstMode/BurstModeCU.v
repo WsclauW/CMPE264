@@ -127,6 +127,42 @@ always@(CurrentState,Counter,CE)
 				end
 			ReadStart:
 				begin
+					if(Counter == 4)
+						begin
+							Mode = DPIdle;
+							ConADV = 1;
+							ConCE  = 0;
+							ConWE  = 0;
+							ConUB  = 0;
+							ConLB  = 0;
+							ResetCount = 1;
+							CountCE    = 0;
+							NextState = ReadContinue;
+						end
+					else if (Counter == 1)
+						begin
+							Mode = DPIdle;
+							ConADV = 1;
+							ConCE  = 0;
+							ConWE  = 0;
+							ConUB  = 0;
+							ConLB  = 0;
+							CountCE = 1;
+							ResetCount = 0;
+							NextState = ReadStart;
+						end
+					else	
+						begin
+							Mode = DPAddress;
+							ConADV = 0;
+							ConCE  = 0;
+							ConWE  = 1;
+							ConUB  = 0;
+							ConLB  = 0;
+							CountCE = 1;
+							ResetCount = 0;
+							NextState = ReadStart;
+						end
 				
 				end
 			ReadContinue:
@@ -213,7 +249,7 @@ always @(posedge CLK)
 		CurrentState = NextState;
 	end
 
-//Counter Flip-Flop
+//Counter Flipfop
 always @(posedge CLK)
 	begin
 		if(CountCE)
