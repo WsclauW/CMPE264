@@ -24,13 +24,15 @@
 
 module BurstModeTB;
 
+`include "cellram_parameters.vh"
+
 	// Inputs
 	reg [15:0] DataIn;
 	reg [19:0] AddressIn;
 	reg CE;
 	reg CLK;
-	reg ConWait;
-
+	wire ConWait;
+	wire test;
 	// Outputs
 	wire Yield;
 	wire Done;
@@ -59,28 +61,45 @@ module BurstModeTB;
 		.ConCE(ConCE), 
 		.ConWE(ConWE), 
 		.ConOE(ConOE), 
-		.ConADV(ConADV), 
+		.ConADV_out(ConADV), 
 		.ConLB(ConLB), 
 		.ConUB(ConUB), 
 		.ConDataBus(ConDataBus), 
 		.ConAddressOut(ConAddressOut)
 	);
 
+	 cellram uut2 (
+        .clk    (CLK),
+        .adv_n  (ConADV),
+        .cre    (ConCRE),
+        .o_wait (ConWait),
+        .ce_n   (ConCE),
+        .oe_n   (ConOE),
+        .we_n   (ConWE),
+        .ub_n   (ConUB),
+        .lb_n   (ConLB),
+        .addr   ({3'b00 ,ConAddressOut}),
+        .dq     (ConDataBus)
+    );
+
+assign test = 1'b1;
 	initial begin
 		// Initialize Inputs
 		DataIn = 0;
 		AddressIn = 0;
 		CE = 0;
 		CLK = 0;
-		ConWait = 0;
+		
 
 		// Wait 100 ns for global reset to finish
 		#10;
 		CE = 1; 
 		#50
 		CE = 0;
-		$finish;
+		#200;
 		$stop;
+		//$finish;
+		
 
         
 		// Add stimulus here
@@ -89,8 +108,9 @@ module BurstModeTB;
 
 always 
 	begin
-		CLK = ~CLK;
 		#10;
+		CLK = ~CLK;
+		
 	end
       
 endmodule

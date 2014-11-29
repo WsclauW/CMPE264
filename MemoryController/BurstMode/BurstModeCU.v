@@ -28,7 +28,7 @@ module BurstModeCU(
 	input ConWait,
 	output reg ResetCount,
 	output reg CountCE,
-	output reg [1:0] Mode,
+	output reg [2:0] Mode,
 	output reg Yield,
 	output reg Finished,
 	output reg ConCRE,
@@ -52,21 +52,24 @@ parameter WriteContinue  = 8'b01000000;
 parameter Done      	 = 8'b10000000;
 
 //Data Path Mode Definitions\\
-parameter DPIdle    = 2'b00;
-parameter DPRead    = 2'b01;
-parameter DPCon     = 2'b10;
-parameter DPWrite   = 2'b11;
-parameter DPAddress = 4;
+parameter DPIdle    = 3'b000;
+parameter DPRead    = 3'b001;
+parameter DPCon     = 3'b010;
+parameter DPWrite   = 3'b011;
+parameter DPAddress = 3'b100;
 
 //State Registers\\
 reg [7:0] NextState    = 6'b000001;
 reg [7:0] CurrentState = 6'b000001;
 
-
+//Internal Registers\\
 reg [3:0] Counter;
+reg Delay;
 
+reg ClearDelay;
+reg DelaySig;
 
-always@(CurrentState,Counter,CE)
+always@(CurrentState,Counter,CE, Delay)
 	begin
 
 	//Default Values to prevent latching \\ 
@@ -83,48 +86,71 @@ always@(CurrentState,Counter,CE)
 	NextState = Idle;
 	ResetCount = 0;
 	CountCE = 0;
+	DelaySig = 0;
+	ClearDelay = 0;
+
 		case(CurrentState)
 			Idle:
 				begin
 					if(CE)
 						begin
+
 							NextState = Configure;
 						end
 					else 
 						begin
+							ConADV = 1'b1;
+							ConCRE = 1'b0;
+							ConCE  = 1'b1;
+							ConOE  = 1'b1;
+							ConWE  = 1'b1;
 							NextState = Idle;
 						end
 				end
+
 			Configure:
 				begin
-					if(Counter == 1)
-						begin
-							Mode = DPIdle;
-							ConCRE = 0;
-							ConADV = 1;
-							ConCE  = 1;
-							ConWE  = 1;
-							CountCE = 0;
-							ResetCount = 1;
-							NextState = Idle;
-						end
-					else 
-						begin
-							Mode    = DPCon;
-							ConCRE  = 1;
-							ConADV  = 0;
-							ConCE   = 0;
-							ConWE   = 0;
-							CountCE = 1;
-							ResetCount = 0;
-							NextState = Configure;
-						end
-					
+				 if(Delay)
+							begin
+								Mode    = DPCon;
+								ConCRE  = 1;
+								ConADV  = 0;
+								ConCE   = 0;
+								ConWE   = 0;
+								DelaySig = 0;
+								ClearDelay = 0;
+								NextState = Wait;
+							end
+				else
+					begin
+						Mode  = DPCon;
+								ConCRE  = 1;
+								ConADV  = 1;
+								ConCE   = 0;
+								ConWE   = 1;
+								DelaySig = 1;
+								ClearDelay = 0;
+								NextState = Configure;
+					end
+						
 				end
+
 			Wait:
 				begin
-				
+					if(Counter == 3)
+						begin
+							ResetCount = 1;
+							CountCE    = 0;
+							NextState  = WriteStart;
+						end
+					else
+						begin
+							ResetCount = 0;
+							CountCE    = 1;
+							NextState  = Wait;
+						end
 				end
+
 			ReadStart:
 				begin
 					if(Counter == 4)
@@ -137,11 +163,13 @@ always@(CurrentState,Counter,CE)
 							ConLB  = 0;
 							ResetCount = 1;
 							CountCE    = 0;
+							DelaySig = 0;
+							ClearDelay =1;
 							NextState = ReadContinue;
 						end
-					else if (Counter == 1)
+					else if (Delay)
 						begin
-							Mode = DPIdle;
+							Mode = DPAddress;
 							ConADV = 1;
 							ConCE  = 0;
 							ConWE  = 0;
@@ -149,66 +177,28 @@ always@(CurrentState,Counter,CE)
 							ConLB  = 0;
 							CountCE = 1;
 							ResetCount = 0;
+							DelaySig = 1;
+							ClearDelay =0;
 							NextState = ReadStart;
 						end
 					else	
 						begin
 							Mode = DPAddress;
-							ConADV = 0;
-							ConCE  = 0;
+							ConADV = 1;
+							ConCE  = 1;
 							ConWE  = 1;
-							ConUB  = 0;
-							ConLB  = 0;
+							ConUB  = 1;
+							ConLB  = 1;
 							CountCE = 1;
 							ResetCount = 0;
+							DelaySig = 1;
+							ClearDelay =0;
 							NextState = ReadStart;
 						end
 				
 				end
+
 			ReadContinue:
-				begin
-					
-				end
-			WriteStart:
-				begin
-					if(Counter == 4)
-						begin
-							Mode = DPIdle;
-							ConADV = 1;
-							ConCE  = 0;
-							ConWE  = 0;
-							ConUB  = 0;
-							ConLB  = 0;
-							ResetCount = 1;
-							CountCE    = 0;
-							NextState = WriteContinue;
-						end
-					else if (Counter == 1)
-						begin
-							Mode = DPIdle;
-							ConADV = 1;
-							ConCE  = 0;
-							ConWE  = 0;
-							ConUB  = 0;
-							ConLB  = 0;
-							CountCE = 1;
-							ResetCount = 0;
-							NextState = WriteStart;
-						end
-					else	
-						begin
-							Mode = DPAddress;
-							ConADV = 0;
-							ConCE  = 0;
-							ConWE  = 1;
-							ConUB  = 0;
-							ConLB  = 0;
-							CountCE = 1;
-							ResetCount = 0;
-							NextState = WriteStart;
-						end
-				end
-			WriteContinue:
 				begin
 					if(Wait)
 						begin
@@ -218,22 +208,77 @@ always@(CurrentState,Counter,CE)
 						end
 					else if(Finished) // Note! place holder logic
 						begin
-							NextState = Done	
+							NextState = Done;	
 						end
 					else
 						begin
-							Mode  = DPWrite;
+							Mode  = DPRead;
 							ConCE = 0;
-							NextState = WriteContinue;
+							NextState = ReadContinue;
 						end
 					
-
-					
 				end
+
+			WriteStart:
+				begin
+					if(Counter == 1)
+						begin
+							Mode = DPAddress;
+							ConADV = 1;
+							ConCE  = 0;
+							ConWE  = 0;
+							ConUB  = 0;
+							ConLB  = 0;
+							ResetCount = 1;
+							CountCE    = 0;
+							ClearDelay = 1;
+							DelaySig   = 0;
+							NextState = WriteContinue;
+						end
+					else if(Delay)
+						begin
+							Mode = DPAddress;
+							ConADV = 0;
+							ConCE  = 0;
+							ConWE  = 0;
+							ConUB  = 0;
+							ConLB  = 0;
+							CountCE = 1;
+							ResetCount = 0;
+							ClearDelay = 0;
+							DelaySig   = 1;
+							NextState = WriteStart;
+						end
+					else	
+						begin
+							Mode = DPAddress;
+							DelaySig = 1;
+							ConADV = 1;
+							ConCE  = 1;
+							ConWE  = 1;
+							ConUB  = 1;
+							ConLB  = 1;
+							CountCE = 1;
+							ResetCount = 0;
+							NextState = WriteStart;
+						end
+				end
+
+			WriteContinue:
+						begin
+							Mode  = DPWrite;
+							ConCE = 0;
+							ConUB  = 0;
+							ConLB  = 0;
+							NextState = WriteContinue;
+						end
+
+
 			Done:
 				begin
 				
 				end
+
 			default:
 				begin
 				
@@ -250,7 +295,7 @@ always @(posedge CLK)
 	end
 
 //Counter Flipfop
-always @(posedge CLK)
+always @(negedge CLK or posedge CountCE)
 	begin
 		if(CountCE)
 			begin
@@ -259,6 +304,18 @@ always @(posedge CLK)
 		else 
 			begin
 				Counter = 1'h0;
+			end
+	end
+//Delay siganl\\
+always @(negedge CLK or posedge ClearDelay)
+	begin
+		if(ClearDelay)
+			begin
+				Delay <= 0;
+			end
+		else 
+			begin
+			Delay <= DelaySig;
 			end
 	end
 
@@ -273,19 +330,19 @@ module BurstCounter(
 
 reg [3:0] Count = 1'h0;
 
-always @(posedge clk)
+always @(posedge clk or posedge ResetCount)
 	begin
 		if(CountCE)
 			begin
-				Count = Count + 1;	
+				Count <= Count + 1;	
 			end
 		else if(ResetCount)
 			begin
-				Count = 0;
+				Count <= 0;
 			end
 		else 
 			begin
-				Count = Count;
+				Count <= Count;
 			end
 	end
 

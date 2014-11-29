@@ -31,7 +31,7 @@ module BurstMode(
 	output ConCE,  // Active low
 	output ConWE,  // Active low
 	output ConOE,  // Active low
-	output ConADV, // Active low
+	output ConADV_out, // Active low
 	output ConLB,  // Active low
 	output ConUB,  // Active low
 	inout [15:0]  ConDataBus,
@@ -41,7 +41,11 @@ module BurstMode(
 wire [3:0] DelayCount;
 wire ResetCount;
 wire CountCE;
-wire [1:0] Mode;
+wire [2:0] Mode;
+wire ConADV;
+
+buf test(ConADV_out,ConADV);
+
 BurstModeCU BurstModeCU(
 	.DataIn(DataIn),
 	.AddressIn(AddressIn),
