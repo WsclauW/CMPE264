@@ -96,7 +96,7 @@ assign test = 1'b1;
 		CE = 1; 
 		#50
 		CE = 0;
-		#200;
+		#400;
 		$stop;
 		//$finish;
 		

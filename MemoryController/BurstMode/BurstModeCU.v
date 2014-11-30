@@ -153,12 +153,12 @@ always@(CurrentState,Counter,CE, Delay)
 
 			ReadStart:
 				begin
-					if(Counter == 4)
+					if(Counter == 1)
 						begin
-							Mode = DPIdle;
+							Mode = DPAddress;
 							ConADV = 1;
 							ConCE  = 0;
-							ConWE  = 0;
+							ConWE  = 1;
 							ConUB  = 0;
 							ConLB  = 0;
 							ResetCount = 1;
@@ -170,9 +170,9 @@ always@(CurrentState,Counter,CE, Delay)
 					else if (Delay)
 						begin
 							Mode = DPAddress;
-							ConADV = 1;
+							ConADV = 0;
 							ConCE  = 0;
-							ConWE  = 0;
+							ConWE  = 1;
 							ConUB  = 0;
 							ConLB  = 0;
 							CountCE = 1;
@@ -200,20 +200,12 @@ always@(CurrentState,Counter,CE, Delay)
 
 			ReadContinue:
 				begin
-					if(Wait)
-						begin
-							NextState = Wait;
-							Mode  = DPIdle;
-							ConCE = 0;
-						end
-					else if(Finished) // Note! place holder logic
-						begin
-							NextState = Done;	
-						end
-					else
 						begin
 							Mode  = DPRead;
 							ConCE = 0;
+							ConLB = 0;
+							ConUB = 0;
+							ConOE = 0;
 							NextState = ReadContinue;
 						end
 					
@@ -265,14 +257,27 @@ always@(CurrentState,Counter,CE, Delay)
 				end
 
 			WriteContinue:
+				begin
+					if(Counter == 4)
 						begin
-							Mode  = DPWrite;
-							ConCE = 0;
+							Mode   = DPWrite;
+							ConCE  = 1;
+							ConUB  = 1;
+							ConLB  = 1;
+							CountCE = 0;
+							ResetCount = 1;
+							NextState = ReadStart;
+						end
+					else begin
+							Mode   = DPWrite;
+							ConCE  = 0;
 							ConUB  = 0;
 							ConLB  = 0;
+							CountCE = 1;
+							ResetCount = 0;
 							NextState = WriteContinue;
 						end
-
+				end
 
 			Done:
 				begin

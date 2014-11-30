@@ -74,11 +74,12 @@ always@ (Mode)
 					end
 				Read:
 					begin
-						
+						//ConAddressOut = 20'b00000000000000111111;
+						DataReg		  = ConDataBus;
 					end
 				Write:
 					begin
-						ConAddressOut = 20'b00000000000000111111;
+						//ConAddressOut = 20'b00000000000000111111;
 						DataReg       = 16'b11010111011011010011;
 					end
 				Address:
