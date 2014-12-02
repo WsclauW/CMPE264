@@ -211,10 +211,15 @@ always@(*) begin
             byte_count_rst <= 0;
             if (!busy) begin
                 byte_count_en <= 1;
-                data_tx_valid <= 1;
             end
             else begin
                 byte_count_en <= 0;
+            end
+            
+            if (!busy && byteCount < 4) begin
+                data_tx_valid <= 1;
+            end
+            else begin
                 data_tx_valid <= 0;
             end
             tx_parallel_we <= 0;

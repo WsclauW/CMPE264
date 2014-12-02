@@ -33,13 +33,15 @@ reg [39:0] uart_tx_data;
 reg [5:0] mips_opcode;
 reg [4:0] mips_reg_s;
  
-integer j;     
+integer j;  
+integer error;   
 initial begin
     clk50MHz = 0;
     clk_uart = 0;
     reset = 1;
     uart_tx = 1;
     uart_counter = 0;
+    error = 0;
     
     mips_opcode = 6'b001000; // addi
     mips_reg_s = 5'b0;       // $0
@@ -68,10 +70,45 @@ initial begin
         writeUARTFrame({1'b0, j[6:0]}); // read from address j
         @(posedge uart_rx_data_valid) begin
             if (uart_rx_data != j) begin
-                $display("ERROR");
+                $display("ERROR: expecting %h received %h", j[7:0], uart_rx_data);
+                error = error + 1;
+            end
+            else begin
+                $display("SUCCESS: expecting %h received %h", j[7:0], uart_rx_data);
             end
         end
+        @(posedge uart_rx_data_valid) begin //should be 0
+            if (uart_rx_data != 0) begin
+                $display("ERROR: expecting 0 received %h", uart_rx_data);
+            end
+        end
+        @(posedge uart_rx_data_valid) begin //should be 0
+            if (uart_rx_data != 0) begin
+                $display("ERROR: expecting 0 received %h", uart_rx_data);
+            end
+        end
+        @(posedge uart_rx_data_valid) begin //should be 0
+            if (uart_rx_data != 0) begin
+                $display("ERROR: expecting 0 received %h", uart_rx_data);
+            end
+        end
+        @(posedge clk_uart) begin // wait for stop bits (two)
+        
+        end
+        @(posedge clk_uart) begin
+        
+        end
+        @(posedge clk_uart) begin
+        
+        end
     end 
+    
+    if (error == 0) begin
+        $display("SUCCESS: TEST PASS");
+    end
+    else begin
+        $display("ERROR: TEST FAILED");
+    end
 end
 
 always begin
