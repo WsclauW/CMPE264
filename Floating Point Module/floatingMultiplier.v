@@ -5,37 +5,69 @@
 // Bit 30 - 23 is the EXPONENT
 // Bit 22 - 0 is the  SIGNIFICAND
 
-module floating_multiplier(input [31:0] a, b, 
+module floating_multiplier(input [31:0] a, b,
+									input CLK, loadInReg, loadOutReg,
 									output [31:0] c);
-									
+		
+		wire [31:0] num0_out, num1_out;
+		wire [7:0] subtract_out, adder_out;
+		wire [22:0] significand_out;
+		wire sign, sign2OutputReg;
+		
+		register num0(.in(a), .set(loadInReg), .CLK(CLK), .out(num0_out));
+		register num1(.in(b), .set(loadInReg), .CLK(CLK), .out(num1_out));
+		subtractor subtract(.a(num0_out[30:23]), .b(subtract_out));
+		exponentAdder adder(.a(subtract_out), .b(num1_out[30:23]), .sum(adder_out));
+		x_or out_sign(.a(num0_out[31]), .b(num1_out[31]), .c(sign2OutputReg));
+		multiplier multer(.significand1(num0_out[22:0]), .significand2(num1_out[22:0]), .product(significand_out));
+		register outputNum_register(.in({sign2OutputReg, adder_out, significand_out}), .set(loadOutReg), .CLK(CLK), .out(c));
 endmodule
 
-module xort(input a, b,
+// xor module
+module x_or(input a, b,
 				output	c);
-	assign c = a^b;
+		assign c = a^b;
 endmodule
 
-module exponentAddition(input [7:0] a, b, 
-									output [7:0] hi_output, low_output);
-		reg [15:0] sum;
+/*
+exponentAddition takes the exponents from both floating points and 
+adds them, producting two outputs named hi_output and low_output
+*/
+module exponentAdder(input [7:0] a, b, 
+									output reg [7:0] sum);
 		always@(*)
-			assign sum = a + b;
-			assign low_output = sum[7:0];
-			assign hi_output = sum[15:8];
+		begin
+			sum = a + b - 1;
+		end
 endmodule
 
-module exponentUpdate(input [7:0] a,b,
-									output [7:0] c);
+module subtractor(input [7:0] a,
+							output reg[7:0] b);
+		reg [7:0] difference;
+		always@(*)
+			b = a -  8'b11111111;
 endmodule
 
 // multiplier takes two significands and multiplies them together
 module multiplier(input [22:0] significand1, significand2,
-						output [22:0] hi_output, low_output);
-	reg [45:0] product;
+						output reg [22:0] product);
 	always@(*)
-		assign product = significand1 * significand2;
-		assign low_output = product[22:0];
-		assign hi_output = product[45:23];
+		product = significand1 * significand2;
+endmodule
+
+module register(input [31:0] in,
+						input set, CLK, 
+						output reg [31:0] out);
+		always @ (posedge CLK)
+			if (set)
+				out = in; 
+			else
+				out = out;
+endmodule
+
+/*
+module exponentUpdate(input [7:0] a,b,
+									output [7:0] c);
 endmodule
 
 module normalizeModule();
@@ -46,3 +78,5 @@ endmodule
 
 module sticky();
 endmodule
+
+*/
