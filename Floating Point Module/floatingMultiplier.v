@@ -5,6 +5,12 @@
 // Bit 30 - 23 is the EXPONENT
 // Bit 22 - 0 is the  SIGNIFICAND
 
+module controUnit();
+endmodule
+
+module dataPath();
+endmodule
+
 module floating_multiplier(input [31:0] a, b,
 									input CLK, loadInReg, loadOutReg,
 									output [31:0] c);
