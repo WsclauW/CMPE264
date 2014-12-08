@@ -4,15 +4,112 @@
 // Bit 31 of the floating point is the SIGN BIT
 // Bit 30 - 23 is the EXPONENT
 // Bit 22 - 0 is the  SIGNIFICAND
+`timescale 1ns/1ps
 
-module controUnit();
+module topLevel(input start, clk,
+						input [31:0] val_1, val_2,
+						output done,
+						output [31:0] val_out,
+						output [2:0] CS,
+						output wire changed);
+	wire loadFirstStage, loadSecondStage,ack;
+	controlUnit CU(.ack(ack),.start(start), .clk(clk), .changed(changed), .loadFirstStage(loadFirstStage), .loadSecondStage(loadSecondStage), .done(done), .CS(CS));
+	floating_multiplier f_mult(.ack(ack), .a(val_1), .b(val_2), .CLK(clk), .loadInReg(loadFirstStage), .loadOutReg(loadSecondStage), .changed(changed), .c(val_out));
 endmodule
 
-module dataPath();
+module controlUnit(input start, clk, changed,
+							output reg loadFirstStage, loadSecondStage, done, ack,
+							output reg [2:0] CS);
+	//reg [2:0] CS, NS;
+	reg [2:0] NS;
+	parameter 	state0 = 3'b000,	//idle
+						state1 = 3'b001,	//loading inputs
+						state2 = 3'b010,	//loading output
+						state3 = 3'b011,	//wait
+						state4 = 3'b100;	//done
+	
+	always @ (CS, start)
+	begin
+		case(CS)
+			state0: begin
+				if(start) 
+					NS = state1;
+				else 
+					NS = state0;
+			end
+			
+			state1: begin 
+				NS = state2;
+			end
+			
+			state2: begin
+				NS = state3;
+			end
+			
+			state3: begin
+				if (changed==0)
+					NS = state3;
+				else
+					NS = state4;
+			end
+		
+			state4: begin
+				NS = state0;
+			end
+			default: NS = state0;
+		endcase
+	end
+	
+	
+	always @(posedge clk)
+	begin
+		CS = NS;
+	end
+	
+	always @ (CS)
+	begin
+		case(CS)
+			state0: begin
+				loadFirstStage = 0;
+				loadSecondStage = 0;
+				done = 0;
+				ack = 1;
+			end
+			
+			state1: begin
+				loadFirstStage = 1;
+				loadSecondStage = 0;
+				done = 0;
+				ack = 0;
+			end
+			
+			state2: begin
+				loadFirstStage = 0;
+				loadSecondStage = 1;
+				done = 0;
+				ack = 0;
+			end
+			
+			state3: begin		//wait state
+				loadFirstStage = 0;
+				loadSecondStage = 1;
+				done = 0;
+				ack = 0;
+			end
+			
+			state4: begin		//done state
+				loadFirstStage = 0;
+				loadSecondStage = 0;
+				done = 1;
+				ack = 1;
+			end
+		endcase
+	end
 endmodule
 
 module floating_multiplier(input [31:0] a, b,
-									input CLK, loadInReg, loadOutReg,
+									input CLK, loadInReg, loadOutReg, ack,
+									output changed,
 									output [31:0] c);
 		
 		wire [31:0] num0_out, num1_out;
@@ -26,8 +123,9 @@ module floating_multiplier(input [31:0] a, b,
 		exponentAdder adder(.a(subtract_out), .b(num1_out[30:23]), .sum(adder_out));
 		x_or out_sign(.a(num0_out[31]), .b(num1_out[31]), .c(sign2OutputReg));
 		multiplier multer(.significand1(num0_out[22:0]), .significand2(num1_out[22:0]), .product(significand_out));
-		register outputNum_register(.in({sign2OutputReg, adder_out, significand_out}), .set(loadOutReg), .CLK(CLK), .out(c));
+		smart_register outputNum_register(.ack(ack), .in({sign2OutputReg, adder_out, significand_out}), .set(loadOutReg), .CLK(CLK), .changed(changed), .out(c));
 endmodule
+
 
 // xor module
 module x_or(input a, b,
@@ -69,6 +167,25 @@ module register(input [31:0] in,
 				out = in; 
 			else
 				out = out;
+endmodule
+
+module smart_register(input [31:0] in,
+						input set, CLK, ack,
+						output reg changed,
+						output reg [31:0] out);
+		always @ (posedge CLK)
+		begin
+			if (set)
+				begin
+					if(out == in)
+						changed = 0;
+					else
+						changed = 1;
+					out = in;
+				end
+			else
+				out = out;
+		end
 endmodule
 
 /*
