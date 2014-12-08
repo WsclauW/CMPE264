@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/wsclauw/workspace/Page_Mode/PMTB_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="PMTB" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="24" />
+   <wvobject fp_name="/PMTB/uut/aReset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">aReset</obj_property>
+      <obj_property name="ObjectShortName">aReset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/Clock" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">Clock</obj_property>
+      <obj_property name="ObjectShortName">Clock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/ControlUnit/state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">state[8:0]</obj_property>
+      <obj_property name="ObjectShortName">state[8:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/COUT_CRAM" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">COUT_CRAM[7:0]</obj_property>
+      <obj_property name="ObjectShortName">COUT_CRAM[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/COUT_OUTFIFO" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">COUT_OUTFIFO</obj_property>
+      <obj_property name="ObjectShortName">COUT_OUTFIFO</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/COUT_STATUS" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">COUT_STATUS[3:0]</obj_property>
+      <obj_property name="ObjectShortName">COUT_STATUS[3:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/COUT_PM" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">COUT_PM</obj_property>
+      <obj_property name="ObjectShortName">COUT_PM</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/CIN_PM" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">CIN_PM</obj_property>
+      <obj_property name="ObjectShortName">CIN_PM</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/S_SOut" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">S_SOut[3:0]</obj_property>
+      <obj_property name="ObjectShortName">S_SOut[3:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/S_aTOne" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">S_aTOne</obj_property>
+      <obj_property name="ObjectShortName">S_aTOne</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/S_HWOne" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">S_HWOne</obj_property>
+      <obj_property name="ObjectShortName">S_HWOne</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/ControlUnit/next_state" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">next_state[8:0]</obj_property>
+      <obj_property name="ObjectShortName">next_state[8:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DIN_Address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DIN_Address[21:0]</obj_property>
+      <obj_property name="ObjectShortName">DIN_Address[21:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/C_Address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">C_Address[1:0]</obj_property>
+      <obj_property name="ObjectShortName">C_Address[1:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DataPath/Address_Out" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">Address_Out[22:0]</obj_property>
+      <obj_property name="ObjectShortName">Address_Out[22:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/C_SA_A" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C_SA_A</obj_property>
+      <obj_property name="ObjectShortName">C_SA_A</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DOUT_ADDR" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DOUT_ADDR[22:0]</obj_property>
+      <obj_property name="ObjectShortName">DOUT_ADDR[22:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DIN_Length" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DIN_Length[2:0]</obj_property>
+      <obj_property name="ObjectShortName">DIN_Length[2:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/C_HWords" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">C_HWords[1:0]</obj_property>
+      <obj_property name="ObjectShortName">C_HWords[1:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/C_SA_D" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">C_SA_D[1:0]</obj_property>
+      <obj_property name="ObjectShortName">C_SA_D[1:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DataPath/Data_Out" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">Data_Out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">Data_Out[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/C_BusOut" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">C_BusOut</obj_property>
+      <obj_property name="ObjectShortName">C_BusOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DIO_CRAM" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DIO_CRAM[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DIO_CRAM[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/PMTB/uut/DOUT_CPU" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">DOUT_CPU[15:0]</obj_property>
+      <obj_property name="ObjectShortName">DOUT_CPU[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+</wave_config>
